@@ -5,9 +5,8 @@ import json
 headers = {"Accept": "application/json"}
 myssl = ssl._create_unverified_context()
 
-#If directly using telegram
-#-> fill in the values
-#-> export to env var
+##If directly using telegram
+##either fill in the values or export env var
 chatid = os.environ['chatid']
 teleid = os.environ['teleid']
 telelink = "https://api.telegram.org/bot" + teleid + "/sendMessage?{}"
@@ -60,5 +59,5 @@ for line in nic().readlines():
 #Take action for datapoint
 #for dp in datapoint:
 #   print(dp)
-rs = '\n'.join(datapoint)
+rs = '\n'.join(datapoint) 
 broadcastMessage(rs)

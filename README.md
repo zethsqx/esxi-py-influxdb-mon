@@ -3,7 +3,7 @@
 ## Overview
 It started off to track a number of free ESXi hosts for a "homelab" purpose.  
 The thing is, I have total no control over the network...sounds familiar thou...:smiling_imp:  
-Initial build SPAMMED info to Telegram ¯\\__(ツ)_/¯
+Initial idea was to SPAM info into the Telegram ¯\\__(ツ)_/¯
 
 **Good for**
 - When you need to track your ESXi in a network you have no control
@@ -23,15 +23,15 @@ Initial build SPAMMED info to Telegram ¯\\__(ツ)_/¯
 - An existing influxdb on same management network as ESXi 
 - Telegram (optional, useful for debug) 
 
-## Setting up Prerequisite
+## Setting up
 
-### ESXi Firewall
-You need enable httpClient so python urllib.request can go out   
+### ESXi
+Step 1: Enable httpClient so python urllib.request can go out   
+SSH into ESXi and run the following
 ```
 # esxcli network firewall ruleset list
 # esxcli network firewall ruleset set --ruleset-id=httpClient --enabled true  
 ```
-
 Testing
 ```
 # python3
@@ -40,12 +40,13 @@ Testing
 >>> response = urllib.request.urlopen(req)
 >>> print(response.read())
 ```
-
-For Troubleshooting, you can disable firewall and try again   
-Common errors include; *No route to host*, *Name or service not known*
+If you encounter errors such as; *No route to host*, *Name or service not known*  
+Try disabling the firewall and run again
 ```
 # esxcli network firewall set --enabled false
 ```
+
+Step 2: Transfer the script to the datastore. Easier to use UI to upload  
 
 ### InfluxDB
 This will not be covered.  
@@ -62,14 +63,47 @@ The end goal is to get your
 2) Chat Id
 
 ```
-1- Send a message to your bot
+1. Send a message to your bot
 
-2- Go to following url: https://api.telegram.org/botXXX:YYYY/getUpdates
+2. Go to following url: https://api.telegram.org/botXXX:YYYY/getUpdates
 replace XXX:YYYY with your bot token
 
-3- Look for “chat”:{“id”:zzzzzzzzzz,
+3. Look for “chat”:{“id”:zzzzzzzzzz,
 zzzzzzzzzz is your chat id (with the negative sign).
 ```
+
+## Wrapping up script to Persistent Cronjob
+
+Setup a persistent cronjob for the script. I set it to run at every 10th minute, do change according to your liking.  
+Change <$DATASTORE> path to the one you uploaded at ESXi Step 2  
+```
+1. Edit /etc/rc.local.d/local.sh, insert this before the exit 0 line:
+/bin/kill $(cat /var/run/crond.pid)
+/bin/echo "*/10 * * * * python3 /vmfs/volumes/<$DATASTORE>/s2t.py" >> /var/spool/cron/crontabs/root
+/usr/lib/vmware/busybox/bin/busybox crond
+
+2. Run the script:
+/bin/sh /etc/rc.local.d/local.sh
+
+3. Make the changes persistent:
+/bin/auto-backup.sh
+```
+
+In case, you need to turn off the annoying cronjob temporarily
+```
+1. Edit corn jobs
+vi /var/spool/cron/crontabs/root
+
+2. Check crond pross id
+cat /var/run/crond.pid
+
+3. Kill old crond
+/bin/kill $(cat /var/run/crond.pid)
+
+4. Restart cron jobs
+/usr/lib/vmware/busybox/bin/busybox crond 
+```
+
 
 ## Sample Line Protocol Data
 ```

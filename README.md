@@ -20,6 +20,7 @@ Initial idea was to SPAM info into the Telegram ¯\\__(ツ)_/¯
 ## Prerequisite
 
 - A ESXi running on free
+- Secure Boot disable in BIOS
 - Root account for ESXi
 - Can SSH into the ESXi
 - Enable ruleset on the ESXi

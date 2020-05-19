@@ -107,13 +107,13 @@ cat /var/run/crond.pid
 
 ## Sample Line Protocol Data
 ```
-netif,host=AB9901188700555 device=vmk0,ip_addr=192.168.1.101,netmask=255.255.255.0,broadcast=192.168.1.255,addr_type=DHCP,gateway=192.168.1.1,dhcp_dns=true
-netif,host=AB9901188700555 device=vmk1,ip_addr=10.0.0.101,netmask=255.255.255.0,broadcast=10.0.0.255,addr_type=DHCP,gateway=10.0.0.1,dhcp_dns=false
-disk,host=AB9901188700555 filesystem=VMFS-6,size=225.2G,used=43.4G,available=181.8G,percent_used=19%,mounted=/vmfs/volumes/datastore1
-disk,host=AB9901188700555 filesystem=VMFS-6,size=931.2G,used=122.4G,available=808.8G,percent_used=13%,mounted=/vmfs/volumes/datastore2
-disk,host=AB9901188700555 filesystem=vfat,size=285.8M,used=173.8M,available=112.0M,percent_used=61%,mounted=/vmfs/volumes/5e99e93c-face177a-9ef9-99b203091234
-disk,host=AB9901188700555 filesystem=vfat,size=4.0G,used=19.2M,available=4.0G,percent_used=0%,mounted=/vmfs/volumes/5e99e943-4bf4b7fc-9ef9-99b203091234
-disk,host=AB9901188700555 filesystem=vfat,size=249.7M,used=4.0K,available=249.7M,percent_used=0%,mounted=/vmfs/volumes/559da07d-33e690f7-9ef9-bb5c300f2f5f
-disk,host=AB9901188700555 filesystem=vfat,size=249.7M,used=148.4M,available=101.3M,percent_used=59%,mounted=/vmfs/volumes/5810a97b-84564ee3-9ef9-f300f6a11148
-nic,host=AB9901188700555 name=vmnic0,pci=0000:00:1f.6,driver=ne1000,link=Up,speed=1000Mbps,duplex=Full,mac=ab:bc:01:01:01:01,mtu=1500
+netif,host="AB1709487799208" device="vmk0",ip_addr="192.168.1.198",netmask="255.255.255.0",broadcast="192.168.1.255",addr_type="DHCP",gateway="192.168.1.1",dhcp_dns="true"
+netif,host="AB1709487799208" device="vmk1",ip_addr="192.168.100.198",netmask="255.255.255.0",broadcast="192.168.100.255",addr_type="DHCP",gateway="192.168.100.1",dhcp_dns="false"
+disk,host="AB1709487799208" filesystem="VMFS-6",size=241860345856,used=46644854784,available=195215491072,percent_used=19,mounted="/vmfs/volumes/datastore1"
+disk,host="AB1709487799208" filesystem="VMFS-6",size=999922073600,used=131470458880,available=868451614720,percent_used=13,mounted="/vmfs/volumes/datastore2"
+disk,host="AB1709487799208" filesystem="vfat",size=261853184,used=4096,available=261849088,percent_used=0,mounted="/vmfs/volumes/7999997d-12e999f7-8719-ec5c39999f5b"
+disk,host="AB1709487799208" filesystem="vfat",size=299712512,used=182263808,available=117448704,percent_used=61,mounted="/vmfs/volumes/5999993c-face177a-7fb4-54b999990116"
+disk,host="AB1709487799208" filesystem="vfat",size=261853184,used=155602944,available=106250240,percent_used=59,mounted="/vmfs/volumes/6999990b-82194ee3-7d14-f29999a25748"
+disk,host="AB1709487799208" filesystem="vfat",size=4293591040,used=11141120,available=4282449920,percent_used=0,mounted="/vmfs/volumes/59999943-4bf4b7fc-4ca2-54b203999916"
+nic,host="AB1709487799208" name="vmnic0",pci="0000:00:1f.6",driver="ne1000",link="Up",speed="1000Mbps",duplex="Full",mac="aa:ff:ff:ff:ff:16",mtu=1500
 ```

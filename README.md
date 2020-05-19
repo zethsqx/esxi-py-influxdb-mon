@@ -5,6 +5,9 @@ It started off to track a number of free ESXi hosts for a "homelab" purpose.
 The thing is, I have total no control over the network...sounds familiar thou...:smiling_imp:  
 Initial idea was to SPAM info into the Telegram ¯\\__(ツ)_/¯
 
+#### My Environment
+    [ESXi 6.7]<------->[InfluxDB 1.8]
+
 **Good for**
 - When you need to track your ESXi in a network you have no control
 - When you know paying for ESXi is too expensive
@@ -19,39 +22,71 @@ Initial idea was to SPAM info into the Telegram ¯\\__(ツ)_/¯
 - A ESXi running on free
 - Root account for ESXi
 - Can SSH into the ESXi
-- Enable httpclient on the ESXi
+- Enable ruleset on the ESXi
 - An existing influxdb on same management network as ESXi 
 - Telegram (optional, useful for debug) 
 
 ## Setting up
 
 ### ESXi
-Step 1: Enable httpClient so python urllib.request can go out   
+Step 1: Enable remoteSerialPort so python urllib.request can hit Local Server  
+Step 2: Enable httpClient so python urllib.request can hit External Server (Optional)
+
 SSH into ESXi and run the following
 ```
-# esxcli network firewall ruleset list
-# esxcli network firewall ruleset set --ruleset-id=httpClient --enabled true  
+esxcli network firewall ruleset list
+esxcli network firewall ruleset set --ruleset-id=remoteSerialPort --enabled true  
+esxcli network firewall ruleset set --ruleset-id=httpClient --enabled true
 ```
-Testing
+Testing to Local Server
 ```
 # python3
 >>> import urllib.request
->>> req = urllib.request.Request('http://github.com/')
+>>> req = urllib.request.Request('http://192.168.100.10/')
+>>> response = urllib.request.urlopen(req)
+>>> print(response.read())
+```
+Testing to External Server
+```
+# python3
+>>> import urllib.request
+>>> req = urllib.request.Request('https://github.com/')
 >>> response = urllib.request.urlopen(req)
 >>> print(response.read())
 ```
 If you encounter errors such as; *No route to host*, *Name or service not known*  
 Try disabling the firewall and run again
 ```
-# esxcli network firewall set --enabled false
+esxcli network firewall set --enabled false
 ```
 
-Step 2: Transfer the script to the datastore. Easier to use UI to upload  
+Step 3: Transfer the script to the datastore. Easier to use UI to upload  
 
 ### InfluxDB
-This will not be covered.  
-Ensure you can API write request to DB
+Make sure you have a running InfluxDB   
+Ensure DB writable and listening    
 You can refer to https://v2.docs.influxdata.com/v2.0/write-data/#influxdb-api
+
+Useful Commands
+#### DROP Database
+```
+curl -i -XPOST http://192.168.100.10:8086/query --data-urlencode "q=DROP DATABASE esxi"
+```
+#### CREATE Database
+```
+curl -i -XPOST http://192.168.100.10:8086/query --data-urlencode "q=CREATE DATABASE esxi"
+```
+#### SHOW Database
+```
+curl -i -XPOST http://192.168.100.10:8086/query --data-urlencode "q=SHOW DATABASES"  
+```
+#### WRITE Data
+```
+curl -i -XPOST http://192.168.100.10:8086/write?db=esxi --data-binary '
+disk,host="AB1709487799208" filesystem="VMFS-6",size=241860345856,used=46644854784,available=195215491072,percent_used=19,mounted="/vmfs/volumes/datastore1"
+disk,host="AB1709487799208" filesystem="VMFS-6",size=999922073600,used=131470458880,available=868451614720,percent_used=13,mounted="/vmfs/volumes/datastore2"
+disk,host="AB1709487799208" '
+```
 
 ### Telegram (optional)
 Refer to links for information how to create bot -
@@ -88,7 +123,6 @@ Change <$DATASTORE> path to the one you uploaded at ESXi Step 2
 3. Make the changes persistent:
 /bin/auto-backup.sh
 ```
-
 In case, you need to turn off the annoying cronjob temporarily
 ```
 1. Edit corn jobs
@@ -104,7 +138,6 @@ cat /var/run/crond.pid
 /usr/lib/vmware/busybox/bin/busybox crond 
 ```
 
-
 ## Sample Line Protocol Data
 ```
 netif,host="AB1709487799208" device="vmk0",ip_addr="192.168.1.198",netmask="255.255.255.0",broadcast="192.168.1.255",addr_type="DHCP",gateway="192.168.1.1",dhcp_dns="true"
@@ -117,3 +150,9 @@ disk,host="AB1709487799208" filesystem="vfat",size=261853184,used=155602944,avai
 disk,host="AB1709487799208" filesystem="vfat",size=4293591040,used=11141120,available=4282449920,percent_used=0,mounted="/vmfs/volumes/59999943-4bf4b7fc-4ca2-54b203999916"
 nic,host="AB1709487799208" name="vmnic0",pci="0000:00:1f.6",driver="ne1000",link="Up",speed="1000Mbps",duplex="Full",mac="aa:ff:ff:ff:ff:16",mtu=1500
 ```
+
+## Food for Thought
+```
+1. Computionally expensive; Python vs Linux. Sed is very greedy
+2. Serial writing into InfluxDB because of batch writing has bug...
+3. Limited modules on ESXi using urllib, vs urllib2 vs requests...
